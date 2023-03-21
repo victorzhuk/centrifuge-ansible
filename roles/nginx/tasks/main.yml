@@ -1,0 +1,12 @@
+- name: Create nginx conf.d paths
+  ansible.builtin.command: mkdir -p "{{ nginx_dest_path }}/conf.d"
+  changed_when: false
+
+- name: Copy nginx config
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_dest_path }}/conf.d/centrifugo.conf"
+    owner: root
+    group: wheel
+    mode: '0644'
+    backup: true

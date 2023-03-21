@@ -1,0 +1,2 @@
+nginx_dest_path: /usr/local/etc/nginx
+nginx_centrifugo_domain: centrifugo.avtovokzaly.ru

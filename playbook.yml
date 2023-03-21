@@ -1,0 +1,14 @@
+- name: Install and configure centrifuge server
+  hosts: all
+  remote_user: root
+  roles:
+     - role: debian
+       when: ansible_os_family == 'Debian'
+     - role: freebsd
+       when: ansible_os_family == 'FreeBSD'
+
+- name: Configure nginx
+  hosts: nginx
+  remote_user: root
+  roles:
+    - nginx

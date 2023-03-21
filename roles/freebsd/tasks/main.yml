@@ -1,0 +1,30 @@
+- name: Copy centrifugo config
+  ansible.builtin.template:
+    src: config.json.j2
+    dest: /etc/centrifugo.json
+    owner: root
+    group: wheel
+    mode: '0644'
+    backup: true
+
+- name: Copy rc.d service file
+  ansible.builtin.template:
+    src: rc.d_centrifuge.j2
+    dest: /etc/rc.d/centrifugo
+    owner: root
+    group: wheel
+    mode: '0555'
+    backup: true
+
+- name: Install curl
+  ansible.builtin.raw: pkg install curl
+
+- name: Install centrifugo
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl -L https://github.com/centrifugal/centrifugo/releases/download/v4.1.2/centrifugo_4.1.2_freebsd_amd64.tar.gz | tar xzvf - centrifugo
+    mv centrifugo /usr/local/bin/
+    echo centrifugo_enable="YES" >> /etc/rc.conf
+  changed_when: false
+  args:
+    executable: /usr/local/bin/bash

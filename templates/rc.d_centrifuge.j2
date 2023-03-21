@@ -1,0 +1,22 @@
+#!/bin/sh 
+
+. /etc/rc.subr
+
+name="centrifugo"
+program_name="centrifugo"
+title="Centrifugo"
+
+# Command Setup
+exec_path="/usr/local/bin/${program_name}"
+output_file="/var/log/${program_name}.log"
+
+load_rc_config $name
+: ${centrifugo_enable="NO"}
+
+# Command
+command="/usr/sbin/daemon"
+command_args="-c -f -t ${title} -o ${output_file} -P ${pidfile} -r ${exec_path} -c /etc/centrifugo.json"
+
+# Loading Config
+load_rc_config ${name}
+run_rc_command "$1"

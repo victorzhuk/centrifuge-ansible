@@ -1,0 +1,50 @@
+- name: Install curl
+  ansible.builtin.apt:
+    name: curl
+    state: present
+
+- name: Setup centrifugo repository
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl -s https://packagecloud.io/install/repositories/FZambia/centrifugo/script.deb.sh | bash
+  changed_when: false
+  args:
+    executable: /bin/bash
+
+- name: Install centrifugo
+  ansible.builtin.apt:
+    name: centrifugo
+    state: present
+
+- name: Copy centrifugo config
+  ansible.builtin.template:
+    src: config.json.j2
+    dest: /etc/centrifugo/config.json
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+
+- name: Check centrifuge config
+  ansible.builtin.command: /usr/bin/centrifugo checkconfig -c /etc/centrifugo/config.json
+  changed_when: false
+
+- name: Start and enable centrifuge service
+  ansible.builtin.systemd:
+    name: centrifugo
+    state: started
+    enabled: true
+
+- name: Configure system settings, ulimit values
+  community.general.pam_limits:
+    domain: centrifugo
+    limit_type: "{{ item.limit_type }}"
+    limit_item: "{{ item.limit_item }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { limit_type: 'soft', limit_item: 'nofile', value: 65535 }
+    - { limit_type: 'hard', limit_item: 'nofile', value: 65535 }
+
+- name: Reload settings from all system configuration files
+  ansible.builtin.command: sysctl --system
+  changed_when: false

@@ -1,0 +1,4 @@
+*.retry
+group_vars/*.yml
+inventory/*.yml
+keys/*
